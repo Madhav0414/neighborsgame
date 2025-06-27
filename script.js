@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const die1 = document.getElementById('die1');
   const die2 = document.getElementById('die2');
   const rollBtn = document.getElementById('roll-btn');
-  const endTurnBtn = document.getElementById('end-turn-btn');
   const newGameBtn = document.getElementById('new-game-btn');
   const currentNumberDisplay = document.getElementById('current-number');
   const winnerDisplay = document.getElementById('winner-display');
@@ -20,10 +19,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const winnerScore = document.getElementById('winner-score');
 
   let players = [];
-  let currentPlayerIndex = 0;
-  let currentNumber = null;
   let rows = 5, cols = 5;
   let gameActive = false;
+  let currentNumber = null;
+  let playersPlacedThisRound = [];
 
   playerSelect.addEventListener('change', function () {
     const count = parseInt(this.value);
@@ -56,9 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setup.style.display = 'none';
     gameArea.style.display = 'block';
-    currentPlayerIndex = 0;
     gameActive = true;
-    updatePlayerDisplay();
     renderBoards();
     updateScores();
   });
@@ -67,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
     boardsContainer.innerHTML = '';
     players.forEach((player, index) => {
       const div = document.createElement('div');
-      div.className = `player-board ${index === currentPlayerIndex ? 'active-player-board' : ''}`;
+      div.className = 'player-board';
       div.innerHTML = `<div class="board-title">${player.name}</div><div class="game-board"></div>`;
       const boardEl = div.querySelector('.game-board');
       boardEl.style.gridTemplateColumns = `repeat(${cols}, 60px)`;
@@ -85,24 +82,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  function updatePlayerDisplay() {
-    currentPlayerDisplay.textContent = players[currentPlayerIndex].name;
-    document.querySelectorAll('.player-board').forEach((board, i) => {
-      board.classList.toggle('active-player-board', i === currentPlayerIndex);
-    });
-  }
-
   function updateScores() {
     playerScoresContainer.innerHTML = '';
-    players.forEach((p, i) => {
+    players.forEach((p) => {
       const div = document.createElement('div');
-      div.className = `player-score ${i === currentPlayerIndex ? 'current-player' : ''}`;
+      div.className = 'player-score';
       div.textContent = `${p.name}: ${p.score}`;
       playerScoresContainer.appendChild(div);
     });
   }
 
   rollBtn.addEventListener('click', () => {
+    if (!gameActive) return;
+
     const val1 = Math.floor(Math.random() * 6) + 1;
     const val2 = Math.floor(Math.random() * 6) + 1;
     die1.textContent = val1;
@@ -111,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
     die2.classList.add('rolling');
     currentNumber = val1 + val2;
     currentNumberDisplay.textContent = currentNumber;
+    playersPlacedThisRound = [];
 
     setTimeout(() => {
       die1.classList.remove('rolling');
@@ -118,57 +111,45 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 500);
 
     rollBtn.disabled = true;
-    endTurnBtn.disabled = false;
   });
 
   function place(r, c, playerIndex) {
-    if (!gameActive || playerIndex !== currentPlayerIndex || currentNumber === null) return;
+    if (!gameActive || currentNumber === null) return;
     const player = players[playerIndex];
-    if (player.board[r][c] !== null) return;
+    if (player.board[r][c] !== null || playersPlacedThisRound.includes(playerIndex)) return;
 
     const boardDiv = boardsContainer.querySelectorAll('.player-board')[playerIndex];
-    const cell = boardDiv.querySelector('.game-board').children[r * cols + c];
+    const gameBoard = boardDiv.querySelector('.game-board');
+    const cell = gameBoard.children[r * cols + c];
     cell.textContent = currentNumber;
     cell.classList.add('filled');
-
     player.board[r][c] = currentNumber;
     player.movesLeft--;
 
-    currentNumber = null;
-    currentNumberDisplay.textContent = '-';
-    die1.textContent = '-';
-    die2.textContent = '-';
-    rollBtn.disabled = false;
-    endTurnBtn.disabled = true;
+    highlightAdjacent(player.board, gameBoard, r, c);
 
     if (player.movesLeft === 0) {
       scorePlayer(playerIndex);
-      if (players.every(p => p.movesLeft === 0)) return endGame();
-      nextPlayer();
     }
-  }
 
-  endTurnBtn.addEventListener('click', () => {
-    currentNumber = null;
-    currentNumberDisplay.textContent = '-';
-    die1.textContent = '-';
-    die2.textContent = '-';
-    nextPlayer();
-  });
+    playersPlacedThisRound.push(playerIndex);
 
-  function nextPlayer() {
-    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-    updatePlayerDisplay();
-    updateScores();
-    rollBtn.disabled = false;
-    endTurnBtn.disabled = true;
+    if (playersPlacedThisRound.length === players.length) {
+      // Everyone has placed
+      currentNumber = null;
+      currentNumberDisplay.textContent = '-';
+      die1.textContent = '-';
+      die2.textContent = '-';
+      rollBtn.disabled = false;
+
+      if (players.every(p => p.movesLeft === 0)) endGame();
+    }
   }
 
   function scorePlayer(i) {
     const p = players[i];
     let score = 0;
 
-    // Rows
     for (let r = 0; r < rows; r++) {
       let count = 1;
       for (let c = 1; c < cols; c++) {
@@ -181,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (count >= 2) score += count * p.board[r][cols - 1];
     }
 
-    // Columns
     for (let c = 0; c < cols; c++) {
       let count = 1;
       for (let r = 1; r < rows; r++) {
@@ -198,10 +178,33 @@ document.addEventListener('DOMContentLoaded', function () {
     updateScores();
   }
 
+  function highlightAdjacent(board, gameBoardEl, r, c) {
+    const value = board[r][c];
+    const index = r * cols + c;
+    const cell = gameBoardEl.children[index];
+    cell.className = 'cell filled';
+
+    let matched = false;
+    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+
+    for (let [dr, dc] of dirs) {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && board[nr][nc] === value) {
+        const neighborIndex = nr * cols + nc;
+        const neighborCell = gameBoardEl.children[neighborIndex];
+        neighborCell.className = `cell filled colored-${value}`;
+        matched = true;
+      }
+    }
+
+    if (matched) {
+      cell.className = `cell filled colored-${value}`;
+    }
+  }
+
   function endGame() {
     gameActive = false;
     rollBtn.disabled = true;
-    endTurnBtn.disabled = true;
     const winner = players.reduce((a, b) => (a.score > b.score ? a : b));
     winnerName.textContent = winner.name;
     winnerScore.textContent = winner.score;

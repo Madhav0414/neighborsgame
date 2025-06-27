@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -7,14 +7,14 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="rules-box" id="rules-box" style="font-size: 25px;">
+  <div class="rules-box" id="rules-box">
     Rules
     <div class="tooltip">
       <ul>
-        <li>Each player fills their board with dice rolls.</li>
-        <li>Score points for adjacent same-number rows/columns.</li>
-        <li>Game ends when all players fill their boards.</li>
-        <li>Highest score wins!</li>
+        <li>Each round starts with a single dice roll.</li>
+        <li>All players must place that number on their board.</li>
+        <li>Consecutive same numbers are highlighted in color.</li>
+        <li>Game ends when all boards are filled.</li>
       </ul>
     </div>
   </div>
@@ -25,7 +25,7 @@
     <div class="setup-container" id="setup-container">
       <h2>Game Setup</h2>
       <div class="form-group">
-        <label for="player-count">Number of Players (2-4):</label>
+        <label for="player-count">Number of Players (2–4):</label>
         <select id="player-count">
           <option value="2">2 Players</option>
           <option value="3">3 Players</option>

@@ -5,7 +5,7 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #f8f7f2, #f3f3f3);
+  background: linear-gradient(to right, #e0eafc, #cfdef3);
   min-height: 100vh;
   padding: 30px;
   position: relative;
@@ -17,7 +17,7 @@ h1, h2, h3 {
 }
 
 .game-container {
-  background-color: #fec62b;
+  background-color: #fff;
   padding: 30px;
   border-radius: 20px;
   max-width: 1300px;
@@ -62,15 +62,14 @@ button:hover {
 
 .rules-box {
   position: absolute;
-  top: 50px;
-  right: 50px;
+  top: 20px;
+  right: 20px;
   background-color: #fdcb6e;
   padding: 10px 15px;
   border-radius: 10px;
   font-weight: bold;
   cursor: pointer;
   z-index: 999;
-  
 }
 
 .rules-box .tooltip {
@@ -177,8 +176,8 @@ button:hover {
 }
 
 .cell.filled {
-  background-color: #74b9ff;
-  color: white;
+  background-color: #dfe6e9;
+  color: black;
 }
 
 .player-scores {
@@ -199,3 +198,16 @@ button:hover {
   background-color: #55efc4;
   font-weight: bold;
 }
+
+/* Highlight only if adjacent */
+.cell.filled.colored-2  { background-color: #ffeaa7; }
+.cell.filled.colored-3  { background-color: #fab1a0; }
+.cell.filled.colored-4  { background-color: #ff7675; color: white; }
+.cell.filled.colored-5  { background-color: #fd79a8; color: white; }
+.cell.filled.colored-6  { background-color: #a29bfe; color: white; }
+.cell.filled.colored-7  { background-color: #74b9ff; color: white; }
+.cell.filled.colored-8  { background-color: #55efc4; }
+.cell.filled.colored-9  { background-color: #81ecec; }
+.cell.filled.colored-10 { background-color: #ffeaa7; }
+.cell.filled.colored-11 { background-color: #b2bec3; }
+.cell.filled.colored-12 { background-color: #636e72; color: white; }
