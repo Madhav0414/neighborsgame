@@ -45,6 +45,8 @@ input, select {
 }
 
 button {
+  display: block;
+  margin: 15px auto; /* This auto-centers buttons horizontally */
   padding: 12px 24px;
   font-size: 1rem;
   background-color: #6c5ce7;
