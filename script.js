@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let gameActive = false;
   let currentNumber = null;
   let playersPlacedThisRound = [];
+  let currentPlayerIndex = 0;
 
   playerSelect.addEventListener('change', function () {
     const count = parseInt(this.value);
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     gameActive = true;
     renderBoards();
     updateScores();
+    updateCurrentPlayer();
   });
 
   function renderBoards() {
@@ -92,6 +94,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  function updateCurrentPlayer() {
+    currentPlayerDisplay.textContent = players[currentPlayerIndex].name;
+  }
+
   rollBtn.addEventListener('click', () => {
     if (!gameActive) return;
 
@@ -111,12 +117,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 500);
 
     rollBtn.disabled = true;
+    updateCurrentPlayer();
   });
 
   function place(r, c, playerIndex) {
     if (!gameActive || currentNumber === null) return;
+    if (currentPlayerIndex !== playerIndex) return;
+
     const player = players[playerIndex];
-    if (player.board[r][c] !== null || playersPlacedThisRound.includes(playerIndex)) return;
+    if (player.board[r][c] !== null) return;
 
     const boardDiv = boardsContainer.querySelectorAll('.player-board')[playerIndex];
     const gameBoard = boardDiv.querySelector('.game-board');
@@ -134,8 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     playersPlacedThisRound.push(playerIndex);
 
-    if (playersPlacedThisRound.length === players.length) {
-      // Everyone has placed
+    if (playersPlacedThisRound.length === players.length || players.length === 1) {
+      // All players have placed OR single player mode
       currentNumber = null;
       currentNumberDisplay.textContent = '-';
       die1.textContent = '-';
@@ -143,6 +152,14 @@ document.addEventListener('DOMContentLoaded', function () {
       rollBtn.disabled = false;
 
       if (players.every(p => p.movesLeft === 0)) endGame();
+    } else {
+      // Move to next player
+      currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+      if (players[currentPlayerIndex].movesLeft === 0) {
+        // Skip players who have finished
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+      }
+      updateCurrentPlayer();
     }
   }
 

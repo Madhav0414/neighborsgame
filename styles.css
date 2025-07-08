@@ -5,7 +5,7 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #e0eafc, #cfdef3);
+  background: linear-gradient(to right, #fefbe3, #fefbe3);
   min-height: 100vh;
   padding: 30px;
   position: relative;
@@ -26,7 +26,7 @@ h1, h2, h3 {
 }
 
 .setup-container {
-  background-color: #fff57c;
+  background-color: #f79851;
   padding: 20px;
   border-radius: 15px;
 }
@@ -46,7 +46,7 @@ input, select {
 
 button {
   display: block;
-  margin: 15px auto; /* This auto-centers buttons horizontally */
+  margin: 15px auto;
   padding: 12px 24px;
   font-size: 1rem;
   background-color: #6c5ce7;
@@ -66,8 +66,8 @@ button:hover {
   position: absolute;
   top: 20px;
   right: 20px;
-  background-color: #fdcb6e;
-  padding: 10px 15px;
+  background-color: #f79851;
+  padding: 20px 40px;
   border-radius: 10px;
   font-weight: bold;
   cursor: pointer;
@@ -81,19 +81,22 @@ button:hover {
   top: 40px;
   background: #ffeaa7;
   border-radius: 10px;
-  padding: 10px;
-  width: 220px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px;
+  width: 300px;
+  box-shadow: 0 4px 12px rgba(213, 29, 29, 0.2);
+  font-size: 1rem;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .rules-box:hover .tooltip {
   display: block;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
 .tooltip ul {
   padding-left: 20px;
   margin: 0;
-  font-size: 0.9rem;
 }
 
 .dice-container {
